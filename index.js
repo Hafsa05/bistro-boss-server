@@ -28,7 +28,8 @@ async function run() {
 
 		const menuCollection = client.db("bistroDb").collection("menu");
 		const reviewsCollection = client.db("bistroDb").collection("reviews");
-		
+		const cartCollection = client.db("bistroDb").collection("carts");
+
 		app.get('/menu', async (req, res) => {
 			const result = await menuCollection.find().toArray();
 			res.send(result);
@@ -39,7 +40,23 @@ async function run() {
 			res.send(result);
 		})
 
+		// cart collection apis
+		app.get('/carts', async (req, res) => {
+			const email = req.query.email;
+			if (!email) {
+				res.send([]);
+			}
+			const query = { email: email };
+			const result = await cartCollection.find(query).toArray();
+			res.send(result);
+		});
 
+		app.post('/carts', async (req, res) => {
+			const item = req.body;
+			console.log(item);
+			const result = await cartCollection.insertOne(item);
+			res.send(result);
+		})
 
 		// Send a ping to confirm a successful connection
 		await client.db("admin").command({ ping: 1 });
@@ -59,3 +76,18 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
 	console.log(`Bistro Boss is sitting on port ${port}`);
 })
+
+
+
+/**
+ * --------------------------------
+ *      NAMING CONVENTION
+ * --------------------------------
+ * users : userCollection
+ * app.get('/users')        => sob user ke pacche
+ * app.get('/users/:id')    => specific 1ta user pacche using id
+ * app.post('/users')       => create user (usually 1)
+ * app.patch('/users/:id')  => update a specific user
+ * app.put('/users/:id')    => update a specific user
+ * app.delete('/users/:id') => delete a specific user
+*/
